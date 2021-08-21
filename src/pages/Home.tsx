@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
 import { Header } from '../components/Header';
 import { Task, TasksList } from '../components/TasksList';
@@ -14,6 +14,12 @@ export function Home() {
       title: newTaskTitle,
       done: false,
     }
+
+    const titleTodo = tasks.some(item => item.title === newDateTask.title)
+    
+    if (titleTodo === true) {
+      return Alert.alert('ATENÇÃO! Já existe um item com mesmo nome', 'escreva um nove diferente!')
+    }
     setTasks(oldState => [...oldState, newDateTask]);
   }
 
@@ -24,9 +30,24 @@ export function Home() {
   }
 
   function handleRemoveTask(id: number) {
-    setTasks(oldState => oldState.filter(item =>
-      item.id !== id
-    ))
+    Alert.alert('Deseja excluir esse todo?', '', [
+      {
+        text: 'Cancel',
+        style: 'cancel'
+      },
+      {
+        text: 'Ok',
+        onPress: () => setTasks(oldState => oldState.filter(item =>
+          item.id !== id
+        ))
+      }
+    ])
+  }
+
+  function handleEditTask(taskId: number, taskNewTitle: string) {
+    setTasks(oldState => oldState.map(item => 
+      item.id === taskId ? {...item, title: taskNewTitle} : item
+      ))
   }
 
   return (
@@ -38,7 +59,8 @@ export function Home() {
       <TasksList 
         tasks={tasks} 
         toggleTaskDone={handleToggleTaskDone}
-        removeTask={handleRemoveTask} 
+        removeTask={handleRemoveTask}
+        editTask={handleEditTask}
       />
     </View>
   )
